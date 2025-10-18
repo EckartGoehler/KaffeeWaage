@@ -59,10 +59,12 @@ double single_weight_sigma = 0.1;
 /// TIMER variables
 bool time_running = false;
 unsigned long timer_started_millisec = 0;
-static const unsigned long TIMER_DEBOUNCE_WINDOW = 1000;
+static const unsigned long TIMER_DEBOUNCE_WINDOW = 100;
 
 /// SLEEP variables
 bool is_sleeping = false;
+unsigned long sleep_button_millisec = 0;
+static const unsigned long SLEEP_DEBOUNCE_WINDOW = 500;
 
 void u8g2_prepare(void) {
   u8g2.setFlipMode(1);
@@ -216,7 +218,21 @@ void loop()
   
 
   // sleep and wakeup:
-  if (digitalRead(BUTTON_START_PIN) == 0) {  
-        
+  bool sleep_button_pressed = digitalRead(BUTTON_START_PIN) == 0;
+  if (sleep_button_pressed && millis() - sleep_button_millisec  > SLEEP_DEBOUNCE_WINDOW) {
+    sleep_button_millisec  = millis();
+    if (is_sleeping) {
+      // tare
+      scale.tare(tare_average_num);    
+
+      // enable display
+      u8g2.setPowerSave(0);
+      time_running = false;
+      is_sleeping = false;
+    } else {
+      // disable display
+      u8g2.setPowerSave(1);     
+      is_sleeping = true;
+    }
   }
 }
