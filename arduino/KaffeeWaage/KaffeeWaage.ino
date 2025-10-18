@@ -69,6 +69,7 @@ static const unsigned long SLEEP_DEBOUNCE_WINDOW = 500;
 void u8g2_prepare(void) {
   u8g2.setFlipMode(1);
   u8g2.setFont(u8g2_font_10x20_tf);
+  u8g2.setFont(u8g2_font_courB18_tf);
   u8g2.setFontRefHeightExtendedText();
   u8g2.setDrawColor(1);
   u8g2.setFontPosTop();
@@ -183,7 +184,7 @@ void loop()
   int32_t weight_fraction = static_cast<int32_t>(output_weight * DISPLAYED_WEIGHT_FRACTION) - static_cast<int32_t>(output_weight) * DISPLAYED_WEIGHT_FRACTION;
     
   
-  snprintf(out,sizeof(out), "%c%4ld.%02ldg " DEBUG_OUTPUT "          ", 
+  snprintf(out,sizeof(out), "%c%3ld.%02ldg " DEBUG_OUTPUT "          ", 
             is_positive ? ' ' : '-',
             weight_full, 
             weight_fraction
@@ -206,12 +207,12 @@ void loop()
   // print time
   if (time_running) {
     unsigned long delta_time = millis() - timer_started_millisec;
-    snprintf(out,sizeof(out), "%4ld.%01d",delta_time / 1000, (delta_time % 1000) / 100);
+    snprintf(out,sizeof(out), "T: %2ld.%01d",delta_time / 1000, (delta_time % 1000) / 100);
     
   } else {
-    snprintf(out,sizeof(out), "Waiting");
+    snprintf(out,sizeof(out), "T: 0.0");
   }
-  u8g2.drawStr(0,20,out);
+  u8g2.drawStr(0,30,out);
 
   u8g2.sendBuffer();
 
