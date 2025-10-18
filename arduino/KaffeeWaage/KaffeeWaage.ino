@@ -8,7 +8,6 @@
 #include "stdio.h" // snprintf
 #include "HX711.h"
 
-
 //#define DEBUG 1
 
 #ifdef DEBUG
@@ -28,6 +27,10 @@
 const int LOADCELL_DOUT_PIN = 2;
 const int LOADCELL_SCK_PIN = 3;
 
+//  buttons
+const int BUTTON_START_PIN = 4;
+const int BUTTON_TIME_PIN = 5;
+
 // the loadcell ADC access class
 HX711 scale;
 
@@ -36,7 +39,7 @@ U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 
 
 double scaling = 1./(1000./379351.56);
-const int tare_average_num = 20;
+const int tare_average_num = 1;
 
 // last measured weight:
 double last_weight = 0;
@@ -53,8 +56,17 @@ const int MAX_AVERAGE = 10;
 double single_weight_sigma = 0.1;
 
 
+/// TIMER variables
+bool time_running = false;
+unsigned long timer_started_millisec = 0;
+static const unsigned long TIMER_DEBOUNCE_WINDOW = 1000;
+
+/// SLEEP variables
+bool is_sleeping = false;
+
 void u8g2_prepare(void) {
-  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.setFlipMode(1);
+  u8g2.setFont(u8g2_font_10x20_tf);
   u8g2.setFontRefHeightExtendedText();
   u8g2.setDrawColor(1);
   u8g2.setFontPosTop();
@@ -64,9 +76,16 @@ void u8g2_prepare(void) {
 
 void setup()
 {
+  Serial.begin(57600);
+  Serial.println("Setup started");
+  
   // output of LED to report measurement update
   pinMode(LED_BUILTIN, OUTPUT);
 
+  // button pins:
+  pinMode(BUTTON_START_PIN, INPUT_PULLUP);
+  pinMode(BUTTON_TIME_PIN, INPUT_PULLUP);
+ 
   // read scaling factor from EEPROM, if there is any:
   if (EEPROM.read(EEPROM_SCALE_ADDR) != 255) {
     EEPROM.get(EEPROM_SCALE_ADDR,scaling);
@@ -80,14 +99,18 @@ void setup()
   }
   
 
+  Serial.println("Setup display");
 	// initialize the LCD
 	u8g2.begin();
-
   u8g2_prepare();
 
   u8g2.clearBuffer();
   u8g2.drawStr(0,0,"Tarieren");
   u8g2.sendBuffer();
+
+
+   Serial.println("Setup scale");
+
   // Initialize library with data output pin, clock input pin and gain factor.
   // Channel selection is made by passing the appropriate gain:
   // - With a gain factor of 64 or 128, channel A is selected
@@ -96,9 +119,16 @@ void setup()
   // default "128" (Channel A) is used here.
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
 
+  Serial.println("Setup scale: scaling");
+
   scale.set_scale(scaling);    // this value is obtained by calibrating the scale with known weights; see the README for details
+
+  Serial.println("Setup scale:tare");
   scale.tare(5);
+  Serial.println("Setup scale:tare-avg");
   scale.tare(tare_average_num);                // reset the scale to 0
+  Serial.println("Setup completed");
+
 }
 
 bool blink_on = false;
@@ -160,8 +190,33 @@ void loop()
 #endif
             );
 
+  // print weight
   u8g2.clearBuffer();
   u8g2.drawStr(0,0,out);
+
+  // timer indication
+  bool timer_button_pressed = digitalRead(BUTTON_TIME_PIN) == 0;
+  if (timer_button_pressed && millis() - timer_started_millisec > TIMER_DEBOUNCE_WINDOW) {
+    timer_started_millisec = millis();
+    time_running  = ! time_running;
+  } 
+
+  // print time
+  if (time_running) {
+    unsigned long delta_time = millis() - timer_started_millisec;
+    snprintf(out,sizeof(out), "%4ld.%01d",delta_time / 1000, (delta_time % 1000) / 100);
+    
+  } else {
+    snprintf(out,sizeof(out), "Waiting");
+  }
+  u8g2.drawStr(0,20,out);
+
   u8g2.sendBuffer();
 
+  
+
+  // sleep and wakeup:
+  if (digitalRead(BUTTON_START_PIN) == 0) {  
+        
+  }
 }
