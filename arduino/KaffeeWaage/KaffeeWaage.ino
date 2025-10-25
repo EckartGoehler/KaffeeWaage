@@ -59,7 +59,7 @@ double single_weight_sigma = 0.1;
 /// TIMER variables
 bool time_running = false;
 unsigned long timer_started_millisec = 0;
-static const unsigned long TIMER_DEBOUNCE_WINDOW = 100;
+static const unsigned long TIMER_DEBOUNCE_WINDOW = 500;
 
 /// SLEEP variables
 bool is_sleeping = false;
