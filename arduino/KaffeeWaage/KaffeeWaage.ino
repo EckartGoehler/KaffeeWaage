@@ -21,7 +21,7 @@
 #define EEPROM_OFFSET_ADDR (2 * sizeof(double))
 
 
-#define DISPLAYED_WEIGHT_FRACTION 10
+#define DISPLAYED_WEIGHT_FRACTION 100
 
 // HX711 circuit wiring
 const int LOADCELL_DOUT_PIN = 2;
