@@ -86,8 +86,11 @@ void setup()
   if (EEPROM.read(EEPROM_SIGMA_ADDR) != 255) {
     double raw_sigma;
     EEPROM.get(EEPROM_SIGMA_ADDR,raw_sigma);
-    single_weight_sigma = raw_sigma / scaling;
+    single_weight_sigma = raw_sigma / fabs(scaling);
+    Serial.print(F("Raw sigma:")); Serial.println(raw_sigma);
+    Serial.print(F("weight sigma:")); Serial.println(single_weight_sigma);
   }
+  
  
 
  

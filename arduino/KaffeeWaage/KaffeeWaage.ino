@@ -68,8 +68,11 @@ static const unsigned long SLEEP_DEBOUNCE_WINDOW = 500;
 
 void u8g2_prepare(void) {
   u8g2.setFlipMode(1);
-  u8g2.setFont(u8g2_font_10x20_tf);
+  #ifdef DEBUG
+  u8g2.setFont(u8g2_font_5x7_tf); // small
+  #else 
   u8g2.setFont(u8g2_font_courB18_tf);
+  #endif
   u8g2.setFontRefHeightExtendedText();
   u8g2.setDrawColor(1);
   u8g2.setFontPosTop();
@@ -98,7 +101,9 @@ void setup()
   if (EEPROM.read(EEPROM_SIGMA_ADDR) != 255) {
     double raw_sigma;
     EEPROM.get(EEPROM_SIGMA_ADDR,raw_sigma);
-    single_weight_sigma = raw_sigma / scaling;
+    single_weight_sigma = raw_sigma / fabs(scaling);
+    Serial.print(F("Raw sigma:")); Serial.println(raw_sigma);
+    Serial.print(F("weight sigma:")); Serial.println(single_weight_sigma);
   }
   
 
