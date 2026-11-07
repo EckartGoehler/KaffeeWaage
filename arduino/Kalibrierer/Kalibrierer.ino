@@ -22,12 +22,13 @@ double scaling = 1./(1000./416186.00);
 const uint8_t offset_num = 100; 
 const uint8_t calibration_num = 100; 
 const uint32_t sigma_num = 100;
-const uint32_t gain_factor = 128; // could be 128 (default), 64 or 32 (channel B)
+const uint32_t gain_factor = 32; // could be 128 (default), 64 or 32 (channel B)
 
 
 void setup() {
   Serial.begin(57600);
-  scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN,gain_factor);
+  scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
+  scale.set_gain(gain_factor);
 
   // load latest scaling
   if (EEPROM.read(EEPROM_SCALE_ADDR) != 255) {

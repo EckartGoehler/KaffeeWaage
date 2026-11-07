@@ -100,8 +100,10 @@ void setup()
   // By omitting the gain factor parameter, the library
   // default "128" (Channel A) is used here.
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
+  scale.set_gain(32);
 
-  Serial.println("Setup scale: scaling");
+  Serial.print("Setup scale: scaling=");
+  Serial.println(scaling);
 
   scale.set_scale(scaling);    // this value is obtained by calibrating the scale with known weights; see the README for details
 
@@ -109,6 +111,10 @@ void setup()
   scale.tare(5);
   Serial.println("Setup scale:tare-avg");
   scale.tare(tare_average_num);                // reset the scale to 0
+  scale.read();
+  if (scale.getLastError() != HX711_OK) {
+    Serial.println("Error reading HX711!");
+  }
   Serial.println("Setup completed");
 
 }

@@ -80,7 +80,7 @@ void u8g2_prepare(void) {
 void setup()
 {
   Serial.begin(57600);
-  Serial.println("Setup started");
+  Serial.println(F("Setup started"));
   
   // output of LED to report measurement update
   pinMode(LED_BUILTIN, OUTPUT);
@@ -102,7 +102,7 @@ void setup()
   }
   
 
-  Serial.println("Setup display");
+  Serial.println(F("Setup display"));
 	// initialize the LCD
 	u8g2.begin();
   u8g2_prepare();
@@ -112,7 +112,7 @@ void setup()
   u8g2.sendBuffer();
 
 
-   Serial.println("Setup scale");
+   Serial.println(F("Setup scale"));
 
   // Initialize library with data output pin, clock input pin and gain factor.
   // Channel selection is made by passing the appropriate gain:
@@ -120,17 +120,19 @@ void setup()
   // - With a gain factor of 32, channel B is selected
   // By omitting the gain factor parameter, the library
   // default "128" (Channel A) is used here.
+  
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-
-  Serial.println("Setup scale: scaling");
+  scale.set_gain(32);
+ 
+  Serial.println(F("Setup scale: scaling"));
 
   scale.set_scale(scaling);    // this value is obtained by calibrating the scale with known weights; see the README for details
 
-  Serial.println("Setup scale:tare");
+  Serial.println(F("Setup scale:tare"));
   scale.tare(5);
-  Serial.println("Setup scale:tare-avg");
+  Serial.println(F("Setup scale:tare-avg"));
   scale.tare(tare_average_num);                // reset the scale to 0
-  Serial.println("Setup completed");
+  Serial.println(F("Setup completed"));
 
 }
 
@@ -224,7 +226,7 @@ void loop()
     sleep_button_millisec  = millis();
     if (is_sleeping) {
       // tare
-      scale.tare(tare_average_num);    
+      //scale.tare(tare_average_num);    
 
       // enable display
       u8g2.setPowerSave(0);
