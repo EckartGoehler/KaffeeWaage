@@ -49,7 +49,7 @@ void setup() {
   Serial.read();
 
   Serial.println("Running zero offset estimation");
-  uint32_t offset_sum =0;
+  double offset_sum =0;
   for (uint8_t i=0; i < offset_num; i++) {
     while(!scale.is_ready())
       /*wait*/;
@@ -92,7 +92,7 @@ void setup() {
   
   // average
   Serial.println("Running calibration");
-  uint32_t calibration_measurement_sum = 0;
+  double calibration_measurement_sum = 0;
   for (uint8_t i=0; i < calibration_num; i++) {
     while(!scale.is_ready())
       /*wait*/;

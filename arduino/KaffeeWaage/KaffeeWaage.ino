@@ -226,7 +226,7 @@ void loop()
     sleep_button_millisec  = millis();
     if (is_sleeping) {
       // tare
-      //scale.tare(tare_average_num);    
+      scale.tare(tare_average_num);    
 
       // enable display
       u8g2.setPowerSave(0);
